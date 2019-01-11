@@ -1,0 +1,304 @@
+# ---
+#   title: "Peer-graded Assignment: Getting and Cleaning Data Course Project"
+# output:
+#   html_document:
+#   df_print: paged
+# ---
+#   
+#   # hello there!
+#   
+#   The following file the all the procedures to process the given data. This version is Rstudio based, but an HTML is also provided for visualization.
+# 
+# 
+# # the assingment instructions
+# 
+# Getting and Cleaning Data Course Project
+# 
+# The purpose of this project is to demonstrate your ability to collect, work with, and clean a data set. The goal is to prepare tidy data that can be used for later analysis. You will be graded by your peers on a series of yes/no questions related to the project. You will be required to submit: 1) a tidy data set as described below, 2) a link to a Github repository with your script for performing the analysis, and 3) a code book that describes the variables, the data, and any transformations or work that you performed to clean up the data called CodeBook.md. You should also include a README.md in the repo with your scripts. This repo explains how all of the scripts work and how they are connected.
+# 
+# One of the most exciting areas in all of data science right now is wearable computing - see for example this article . Companies like Fitbit, Nike, and Jawbone Up are racing to develop the most advanced algorithms to attract new users. The data linked to from the course website represent data collected from the accelerometers from the Samsung Galaxy S smartphone. A full description is available at the site where the data was obtained:
+#   
+#   http://archive.ics.uci.edu/ml/datasets/Human+Activity+Recognition+Using+Smartphones
+# 
+# Here are the data for the project:
+#   
+#   https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip
+# 
+# You should create one R script called run_analysis.R that does the following.
+# 
+# 1. Merges the training and the test sets to create one data set.
+# 2. Extracts only the measurements on the mean and standard deviation for each measurement.
+# 3. Uses descriptive activity names to name the activities in the data set
+# 4. Appropriately labels the data set with descriptive variable names.
+# 5. From the data set in step 4, creates a second, independent tidy data set with the average of each variable for each activity and each subject.
+# 
+# Good luck!
+#   
+#   
+#   
+#   # 1 Merges the training and the test sets to create one data set.
+#   
+#   ## getting data
+#   
+#   All data should be download and decompressed into the standard directory wihtin the file. The variable below navigates from getwd() into it. Set your setwd() accordilly.
+# ```{r}
+getwd()
+root <- "UCI HAR Dataset"
+# ```
+
+# Now we have everything in place. Let's load the data into R and process it.
+
+## Loading
+# 
+# The column names are in "features.txt" while the remaining two columns (subject and activity) are nameless.
+# 
+# I want a vector with column names:
+# ```{r}
+# move into the directory
+file <- file.path(root, "features.txt")
+column.names <- read.table(file) # the file
+# header = FALSE, # there is no header
+# sep = " ", # white space rulez
+# strip.white = TRUE) # but not so much
+
+# i am also getting rid of the numbers by integrating
+# them into the names
+
+column.names <- with(column.names, paste(V1, V2))
+
+# adding names for subject and activity
+# i am also adding a new column to track
+# the source of each row from the original
+# datasets
+
+column.names <- c("subject", "activity", as.character(column.names), "source")
+# ```
+# 
+# ## the data
+# 
+# Now, lets load the data. train set first.
+# 
+# Data is stored this way:
+# 
+# * dir (test/train)
+# * subject_?.txt (the test subjects)
+# * X_*.txt (the data)
+# * Y_*.txt (the activities)
+# 
+# ```{r}
+## loading the test subjects
+file <- file.path(root, "train/subject_train.txt")
+subjects <- read.table(file)
+
+## activities
+file <- file.path(root, "train/y_train.txt")
+activities <- read.table(file)
+
+## data
+# loading this data may be tricky, the file loads better
+# with read.table. check if the number of obs fits the
+# remaing variables (7352 obs x 561 vars)
+file <- file.path(root, "train/X_train.txt")
+data <- read.table(file)
+
+head(subjects)
+head(activities)
+head(data)
+# ```
+# 
+# 
+# ## Assembling
+# 
+# With all main data available, the main data.frame may be assembled.
+# 
+# ```{r}
+# data.frame itself the handle multiple inputs,
+# there is no need for rbind/cbind now
+# factor() populates the last column: source
+dataset <- data.frame(subjects, activities, data, factor("train"))
+
+# put columns.names on it
+names(dataset) <- column.names
+
+head(dataset)
+# ```
+# 
+# And done. I will keep the names like this for the following reasons:
+# * the numbers help me out locating the columns, this is useful for graphs
+# * some parts of the names are similar and useful for partial matching
+# 
+# Now we reapeat the load process for the test set and merge them togheter.
+# 
+# ## loading, 2
+# 
+# lets reuse the code from before.
+# 
+# ```{r}
+## loading the test subjects
+file <- file.path(root, "test/subject_test.txt")
+subjects <- read.table(file)
+
+## activities
+file <- file.path(root, "test/y_test.txt")
+activities <- read.table(file)
+
+## data
+# loading this data may be tricky, the file loads better
+# with read.table. check if the number of obs fits the
+# remaing variables (2947 obs x 561 vars)
+file <- file.path(root, "test/X_test.txt")
+data <- read.table(file)
+
+head(subjects)
+head(activities)
+head(data)
+# ```
+# 
+# ## assembling, 2
+# 
+# I do prefer to create a second dataset before merge.
+# 
+# ```{r}
+# a second dataset, with more data
+dataset2 <- data.frame(subjects, activities, data, factor("test"))
+
+# same strucutre as before
+names(dataset2) <- column.names
+
+head(dataset2)
+# ```
+# 
+# ## merge
+# 
+# Since the datasets where created with same columns, they can be merged with rbind.
+# 
+# ```{r}
+# since they are same sized and
+# with same column names
+# rbind() behaves well
+data <- rbind(dataset, dataset2)
+# ```
+# 
+# And done again. Now all data is in "data" variable.
+# 
+# ```{r}
+# the following code clears the memory from duplications.
+# it is disabled by default
+
+#rm(activities, dataset, dataset2, subjects, tmp)
+
+# save data
+#save(data, file = "week4.project.csv")
+write.table(data, file = "week4.project.csv", row.names = FALSE)
+# ```
+# 
+# 
+# # 2. Extracts only the measurements on the mean and standard deviation for each measurement.
+# 
+# ## the selected
+# 
+# There are two ways of doing this:
+# * Select manually the columns using its regular interval. This works
+# because every 40 columns mean() and sd() reccurs.
+# * Use grep.
+# 
+# ```{r}
+# the following regex selects only the required columns.
+# the \\ are scape characters for ()
+target <- grep("mean\\(\\)|std\\(\\)", column.names)
+
+# i will also keep the first two
+
+target <- c(1:2, target)
+
+# with this I can easy restrict the data
+selected <- data[, target]
+# ```
+# 
+# # 3. Uses descriptive activity names to name the activities in the data set
+# 
+# ## using factors
+# 
+# The names for the activities are in activity_labels.txt. One just need to substitute them in the data$activities factor.
+# 
+# ```{r}
+# load the data from file
+file <- file.path(root, "activity_labels.txt")
+labels <- read.table(file)
+
+# do the substitution using a anonymous function
+selected$activity <- (with(data, sapply(activity,
+function(item) {labels$V2[item]})
+))
+
+selected$activity <- factor(selected$activity)
+# ```
+# 
+# # 4 Appropriately labels the data set with descriptive variable names.
+# 
+# I like the names choosen by the authors, but some improvement can be done. $subject and $activity are set already, let us focus on the others.
+# 
+# The names follow the structure:
+# 
+# * number
+# * t/f for time or frequency domain
+# * the true variable name
+# * the conversion (mean, std...)
+# * the axis
+# 
+# There are some exceptions that will be dealt with on the way.
+# 
+# I have no need for numbers anymore, I want to use dots to separate fields like we do in R, remove the function calls from function names (so I can use them directly in R) and move the axis first. A regex is needed:
+# 
+# ```{r}
+## pattern 1
+# check names
+names(selected)
+
+# i am using perl like regex. scapes need to be double scaped
+# grouping is per parenthesis
+regex <- "([0-9]+ )(t|f)([A-Za-z]+)\\-(mean|std)\\(\\)\\-(X|Y|Z)"
+#groups:  1       2     3             4           -       5
+
+# check regex
+grep(regex, names(selected))
+
+#change names
+names(selected) <- gsub(regex,"\\2.\\5.\\4.\\3", names(selected))
+
+## pattern 2
+names(selected)
+regex <- "([0-9]+ )(t|f)([A-Za-z]+)\\-(mean|std)\\(\\)"
+# groups  1         2   3               4
+grep(regex, names(selected))
+names(selected) <- gsub(regex,"\\2.\\4.\\3", names(selected))
+
+# all lower case
+names(selected) <- tolower(names(selected))
+# ```
+# 
+# # 5 From the data set in step 4, creates a second, independent tidy data set with the average of each variable for each activity and each subject.
+# 
+# split + lapply + sapply + data.frame produce a useful result. but aggregate() is better.
+# 
+# the data will be like this: each line has the mean of the selected variables for each subject and each activity by that subject.
+# 
+# ```{r}
+# to ensure a good behaviour
+selected$subject <- factor(selected$subject)
+
+factor(selected$subject)
+
+# create a table of averages
+averages <- aggregate(selected, list(selected$subject, selected$activity), mean)
+
+# rename and remove some columns
+averages$subject <- averages$Group.1
+averages$activity <- averages$Group.2
+averages <- averages[, 3:70]
+
+# save data
+#save(averages, file = "averages.R")
+write.table(averages, file = "averages.csv", row.names = FALSE)
+# ```
+
