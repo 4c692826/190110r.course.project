@@ -14,9 +14,9 @@ The following assingment contains the following files:
 
   same as codebook.rmd, but in html format for easy visualization withtou RStudio.
 
-* data.cvs:
+* week4.project.csv.zip:
 
-  the final tidy dataset, with all variable and no conversions
+  the final tidy dataset, with all variable and no conversions. compressed due to large size.
 
 * run_analysis.r:
 
