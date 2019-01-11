@@ -6,6 +6,7 @@ The following assingment contains the following files:
 
   a detailed description on how the procedures are applied to the raw data to convert it into tidy data. requires RStudio.
   it is also the recommended form of dealing with the data. the document is long.
+  there are two outputs from it: week4.data.txt (the complete dataset) and averages.txt (only averaged dataset).
 
 * averages.cvs:
 
