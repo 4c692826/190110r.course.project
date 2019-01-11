@@ -7,16 +7,12 @@ output:
 
 # hello there!
 
-The following file the all the procedures to process the given data. This version is Rstudio based, but an HTML is also provided for visualization.
+The following file holds all the procedures to process the given data. This version is Rstudio based, but an HTML is also provided for visualization.
 
 
 # the assingment instructions
 
-  Getting and Cleaning Data Course Project
-  
-  The purpose of this project is to demonstrate your ability to collect, work with, and clean a data set. The goal is to prepare tidy data that can be used for later analysis. You will be graded by your peers on a series of yes/no questions related to the project. You will be required to submit: 1) a tidy data set as described below, 2) a link to a Github repository with your script for performing the analysis, and 3) a code book that describes the variables, the data, and any transformations or work that you performed to clean up the data called CodeBook.md. You should also include a README.md in the repo with your scripts. This repo explains how all of the scripts work and how they are connected.
-  
-  One of the most exciting areas in all of data science right now is wearable computing - see for example this article . Companies like Fitbit, Nike, and Jawbone Up are racing to develop the most advanced algorithms to attract new users. The data linked to from the course website represent data collected from the accelerometers from the Samsung Galaxy S smartphone. A full description is available at the site where the data was obtained:
+  A full description is available at the site where the data was obtained:
   
   http://archive.ics.uci.edu/ml/datasets/Human+Activity+Recognition+Using+Smartphones
   
@@ -35,24 +31,25 @@ The following file the all the procedures to process the given data. This versio
   Good luck!
 
 
-
 # 1 Merges the training and the test sets to create one data set.
 
-## getting data
+## Getting data
 
-All data should be download and decompressed into the standard directory wihtin the file. The variable below navigates from getwd() into it. Set your setwd() accordilly.
+All data should be download and decompressed into the standard directory within the file. The variable below navigates from getwd() into it. Set your setwd() accordilly.
+In fact, the best approach is to be in the same directory as "UCI HAR Dataset".
+
 ```{r}
 getwd()
 root <- "UCI HAR Dataset"
 ```
 
-Now we have everything in place. Let's load the data into R and process it.
 
-## Loading
+## Loading data
 
 The column names are in "features.txt" while the remaining two columns (subject and activity) are nameless.
 
 I want a vector with column names:
+
 ```{r}
 # move into the directory
 file <- file.path(root, "features.txt")
@@ -74,16 +71,16 @@ column.names <- with(column.names, paste(V1, V2))
 column.names <- c("subject", "activity", as.character(column.names), "source")
 ```
 
-## the data
+## The data
 
 Now, lets load the data. train set first.
 
 Data is stored this way:
 
   * dir (test/train)
-    * subject_?.txt (the test subjects)
-    * X_*.txt (the data)
-    * Y_*.txt (the activities)
+  * subject_?.txt (the test subjects)
+  * X_*.txt (the data)
+  * Y_*.txt (the activities)
   
 ```{r}
 ## loading the test subjects
@@ -129,7 +126,7 @@ And done. I will keep the names like this for the following reasons:
 
 Now we reapeat the load process for the test set and merge them togheter.
 
-## loading, 2
+## Loading data, 2
 
 lets reuse the code from before.
 
@@ -154,7 +151,7 @@ head(activities)
 head(data)
 ```
 
-## assembling, 2
+## Assembling, 2
 
 I do prefer to create a second dataset before merge.
 
@@ -168,7 +165,7 @@ names(dataset2) <- column.names
 head(dataset2)
 ```
 
-## merge
+## Merging
 
 Since the datasets where created with same columns, they can be merged with rbind.
 
@@ -179,7 +176,7 @@ Since the datasets where created with same columns, they can be merged with rbin
 data <- rbind(dataset, dataset2)
 ```
 
-And done gain. Now all data is in "data" variable.
+And done again. Now all data is in "data" variable. Let's save the first output.
 
 ```{r}
 # the following code clears the memory from duplications.
@@ -188,13 +185,14 @@ And done gain. Now all data is in "data" variable.
 #rm(activities, dataset, dataset2, subjects, tmp)
 
 # save data
-#save(data, file = "week4.project.R")
+#save(data, file = "week4.project.csv")
+write.table(data, file = "week4.project.txt", row.names = FALSE)
 ```
 
 
 # 2. Extracts only the measurements on the mean and standard deviation for each measurement.
 
-## the selected
+## The selected columns
 
 There are two ways of doing this:
   * Select manually the columns using its regular interval. This works
@@ -210,7 +208,7 @@ target <- grep("mean\\(\\)|std\\(\\)", column.names)
 
 target <- c(1:2, target)
 
-# with this I can easy restrict the data
+# with this I can easily restrict the data
 selected <- data[, target]
 ```
 
@@ -280,7 +278,7 @@ names(selected) <- tolower(names(selected))
 
 split + lapply + sapply + data.frame produce a useful result. but aggregate() is better.
 
-the data will be like this: each line has the mean of the selected variables for each subject and each activity by that subject.
+the data will be like this: each line has the mean of the selected variables for each subject x activity combination.
 
 ```{r}
 # to ensure a good behaviour
