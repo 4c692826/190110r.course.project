@@ -20,7 +20,11 @@ The following assingment contains the following files:
 
 * run_analysis.r:
 
-  the run version of codebook.rmd
+  the run version of codebook.rmd. it converts UCI HAR Dataset as long as they are in the same folder.
+  
+* UCI HAR Dataset:
+  
+  the original dataset with rawdata. it is converted by run_analysis.
 
 # about the variables
 
