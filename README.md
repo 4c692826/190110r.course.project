@@ -21,3 +21,21 @@ The following assingment contains the following files:
 * run_analysis.r:
 
   the run version of codebook.rmd
+
+# about the variables
+
+The variables were preserved from the raw data, so they are still normalized (non dimensional/without unit) [-1,1] interval data.
+
+source of data:
+
+http://archive.ics.uci.edu/ml/datasets/Human+Activity+Recognition+Using+Smartphones
+
+# about the tidy data
+
+the tidy data consists of the following:
+
+* subject: the test subject for data collection. it is a factor with 30 levels.
+* activity: the activity performed by the test subject. it is a factor with 6 levels.
+* 561 columns of features from means, to standard deviation, entropy, max, min and etc. normalized as above.
+
+There is a total of 10299 observations/rows for each subject-activity pair and 564 columns.
