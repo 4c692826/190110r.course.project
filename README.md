@@ -5,6 +5,7 @@ The following assingment contains the following files:
 * codebook.rmd:
 
   a detailed description on how the procedures are applied to the raw data to convert it into tidy data. requires RStudio.
+  it is also the recommended form of dealing with the data. the document is long.
 
 * averages.cvs:
 
@@ -20,7 +21,7 @@ The following assingment contains the following files:
 
 * run_analysis.r:
 
-  the run version of codebook.rmd. it converts UCI HAR Dataset as long as they are in the same folder.
+  the run version of codebook.rmd. it converts UCI HAR Dataset as long as they are in the same folder. prefer codebook.rmd.
   
 * UCI HAR Dataset:
   
